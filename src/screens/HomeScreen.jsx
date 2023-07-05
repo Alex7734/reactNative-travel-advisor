@@ -38,8 +38,8 @@ const HomeScreen = () => {
 
       <View className="flex-1 relative items-center justify-center">
         <Animatable.Image
-          animation="fadeIn"
-          easing={"eas-in-out"}
+          animation="bounceIn"
+          easing="ease-in-out"
           source={HeroImage}
           className="w-full h-full object-cover"
         />
