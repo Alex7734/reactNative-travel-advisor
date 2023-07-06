@@ -1,17 +1,17 @@
 import axios from "axios";
 
-export const getPlacesData = async () => {
+export const getPlacesData = async (bl_lat, bl_lon, tr_lat, tr_lon, type) => {
   try {
     const {
       data: { data },
     } = await axios.get(
-      "https://travel-advisor.p.rapidapi.com/restaurants/list-in-boundary",
+      `https://travel-advisor.p.rapidapi.com/${type}/list-in-boundary`,
       {
         params: {
-          bl_latitude: "43.60584077999597",
-          tr_latitude: "43.62886852898228",
-          bl_longitude: "25.30096259037221",
-          tr_longitude: "25.3774638794635",
+          bl_latitude: bl_lat,
+          tr_latitude: tr_lat,
+          bl_longitude: bl_lon,
+          tr_longitude: tr_lon,
           limit: "30",
           currency: "USD",
           lunit: "km",

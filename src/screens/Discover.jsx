@@ -28,6 +28,10 @@ const Discover = () => {
   const [type, setType] = React.useState("restaurants");
   const [loading, setLoading] = React.useState(false);
   const [mainData, setMainData] = React.useState([]);
+  const [bl_lat, setBl_lat] = React.useState(null);
+  const [bl_lon, setBl_lon] = React.useState(null);
+  const [tr_lat, setTr_lat] = React.useState(null);
+  const [tr_lon, setTr_lon] = React.useState(null);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -37,13 +41,13 @@ const Discover = () => {
 
   useEffect(() => {
     setLoading(true);
-    getPlacesData().then((data) => {
+    getPlacesData(bl_lat, bl_lon, tr_lat, tr_lon, type).then((data) => {
       setMainData(data);
       setInterval(() => {
         setLoading(false);
       }, 1000);
     });
-  }, []);
+  }, [bl_lat, bl_lon, tr_lat, tr_lon, type]);
 
   return (
     <SafeAreaView className="bg-white flex-1 relative">
@@ -68,6 +72,10 @@ const Discover = () => {
           fetchDetails={true}
           onPress={(data, details = null) => {
             console.log(details?.geometry?.viewport);
+            setBl_lat(details?.geometry?.viewport?.southwest?.lat);
+            setBl_lon(details?.geometry?.viewport?.southwest?.lng);
+            setTr_lat(details?.geometry?.viewport?.northeast?.lat);
+            setTr_lon(details?.geometry?.viewport?.northeast?.lng);
           }}
           query={{
             key: "AIzaSyBbtHHUDEKg_U7IK-dkeX9x72wI3T5Xuhg",
@@ -108,31 +116,52 @@ const Discover = () => {
           </View>
 
           <View>
-            <View className="flex-row items-center justify-between px-4 mt-8">
-              <Text className="text-[#2C7379] text-[28px] font-bold">
-                Top Tips
-              </Text>
-              <TouchableOpacity className="flex-row items-center justify-center space-x-2">
-                <Text className="text-[#A0C4C7] text-[20px] font-bold">
-                  Explore
+            {bl_lat == null ? (
+              <></>
+            ) : (
+              <View className="flex-row items-center justify-between px-4 mt-8">
+                <Text className="text-[#2C7379] text-[28px] font-bold">
+                  Top Tips
                 </Text>
-                <FontAwesome name="long-arrow-right" size={24} color="black" />
-              </TouchableOpacity>
-            </View>
+                <TouchableOpacity className="flex-row items-center justify-center space-x-2">
+                  <Text className="text-[#A0C4C7] text-[20px] font-bold">
+                    Explore
+                  </Text>
+                  <FontAwesome
+                    name="long-arrow-right"
+                    size={24}
+                    color="black"
+                  />
+                </TouchableOpacity>
+              </View>
+            )}
 
             <View className="flex-row items-center justify-evenly px-4 mt-8 flex-wrap">
               {mainData?.length > 0 ? (
                 <>
-                {mainData?.map((item, index) => (
-                    <ItemsCardContainer
-                        key={index}
-                        imageSrc={item?.photo?.images?.medium?.url ? item?.photo?.images?.medium?.url : null}
-                        title={item?.name}
-                        location={item?.location_string}
-                        data={item}
-                    />
-                ))}
+                  {mainData?.map(
+                    (item, index) =>
+                      item?.photo?.images?.medium?.url && (
+                        <ItemsCardContainer
+                          key={index}
+                          imageSrc={
+                            item?.photo?.images?.medium?.url
+                              ? item?.photo?.images?.medium?.url
+                              : null
+                          }
+                          title={item?.name}
+                          location={item?.location_string}
+                          data={item}
+                        />
+                      )
+                  )}
                 </>
+              ) : bl_lat == null ? (
+                <></>
+              ) : loading ? (
+                <View className="flex-1 items-center justify-center">
+                  <ActivityIndicator size="large" color="#0B646B" />
+                </View>
               ) : (
                 <View className="w-full h-[400px] items-center space-y-8 justify-center">
                   <Image source={NotFound} className="w-32 h-32 object-cover" />
